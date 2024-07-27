@@ -1,0 +1,28 @@
+version: '4'
+services:
+  microservice-1:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - '${PORT-8000}:8000'
+    container_name: bun-microservice
+    depends_on:
+      - rabbitmq
+    command: "/bin/sh -c 'bun install && bun run dev'"
+
+  rabbitmq:
+    image: rabbitmq:3.13.6
+    container_name: rabbitmq
+    ports:
+      - '${RABBITMQ_PORT-5672}:5672'
+      - '${RABBITMQ_MANAGEMENT_PORT-15672}:15672'
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - rabbitmq_bun_net
+
+networks:
+  rabbitmq_bun_net:
+    driver: bridge
